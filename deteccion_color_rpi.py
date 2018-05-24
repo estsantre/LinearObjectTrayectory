@@ -5,22 +5,27 @@ import cv2
 import conexion_arduino as arduino
 import numpy as np
 from ObjectInfo import ObjectInfo
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import time
 
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-profile_cascade = cv2.CascadeClassifier('haarcascade_profileface.xml')
-eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
 kernelOp = np.ones((3, 3), np.uint8)
 kernelCl = np.ones((11, 11), np.uint8)
 
 areaTH = 1500
 
+
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 
 def seguir_color(color):
 
-    cap = cv2.VideoCapture(0)
+    camera = PiCamera()
+    camera.resolution = (640, 480)
+    camera.framerate = 32
+    rawCapture = PiRGBArray(camera, size=(640, 480))
+    time.sleep(1)
 
     # Margen de color
     if color == "azul":
@@ -39,8 +44,8 @@ def seguir_color(color):
         return 0
 
     # Dimensiones de la captura
-    width_frame = cap.get(3)
-    height_frame = cap.get(4)
+    width_frame = 640
+    height_frame = 480
 
     print("width ", width_frame, " height ", height_frame)
 
@@ -62,11 +67,12 @@ def seguir_color(color):
 
     ball = ObjectInfo(width_frame, height_frame, number_of_sections)
 
+
     trayectory = None
 
-    while True:
+    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-        _, frame = cap.read()
+        frame = frame.array
 
         mask = cv2.inRange(frame, lower, upper)
 
@@ -113,9 +119,10 @@ def seguir_color(color):
 
         cv2.imshow('Frame', frame)
 
+        rawCapture.truncate(0)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-    cap.release()
     cv2.destroyAllWindows()
     print("Finalizó completamente")
