@@ -6,10 +6,6 @@ import conexion_arduino as arduino
 import numpy as np
 from ObjectInfo import ObjectInfo
 
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-profile_cascade = cv2.CascadeClassifier('haarcascade_profileface.xml')
-eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
-
 kernelOp = np.ones((3, 3), np.uint8)
 kernelCl = np.ones((11, 11), np.uint8)
 
@@ -47,7 +43,7 @@ def seguir_color(color):
 
     # Secciones
 
-    number_of_sections = 8
+    number_of_sections = 32
     sections = []
 
     distance_between_lines = height_frame / number_of_sections
