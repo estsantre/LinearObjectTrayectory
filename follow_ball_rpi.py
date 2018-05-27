@@ -17,11 +17,12 @@ def nothing(*arg):
 icol = (0, 0, 0, 255, 255, 255, 31000)
 
 cv2.namedWindow('colorTest')
+cv2.namedWindow('mask-plain')
 
 # # Lower range colour sliders.
-cv2.createTrackbar('lowHue', 'colorTest', icol[0], 255, nothing)
-cv2.createTrackbar('lowSat', 'colorTest', icol[1], 255, nothing)
-cv2.createTrackbar('lowVal', 'colorTest', icol[2], 255, nothing)
+cv2.createTrackbar('lowHue', 'mask-plain', icol[0], 255, nothing)
+cv2.createTrackbar('lowSat', 'mask-plain', icol[1], 255, nothing)
+cv2.createTrackbar('lowVal', 'mask-plain', icol[2], 255, nothing)
 # # Higher range colour sliders.
 cv2.createTrackbar('highHue', 'colorTest', icol[3], 255, nothing)
 cv2.createTrackbar('highSat', 'colorTest', icol[4], 255, nothing)
@@ -67,9 +68,9 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     e1 = cv2.getTickCount()
 
     # Get HSV values from the GUI sliders.
-    lowHue = cv2.getTrackbarPos('lowHue', 'colorTest')
-    lowSat = cv2.getTrackbarPos('lowSat', 'colorTest')
-    lowVal = cv2.getTrackbarPos('lowVal', 'colorTest')
+    lowHue = cv2.getTrackbarPos('lowHue', 'mask-plain')
+    lowSat = cv2.getTrackbarPos('lowSat', 'mask-plain')
+    lowVal = cv2.getTrackbarPos('lowVal', 'mask-plain')
     highHue = cv2.getTrackbarPos('highHue', 'colorTest')
     highSat = cv2.getTrackbarPos('highSat', 'colorTest')
     highVal = cv2.getTrackbarPos('highVal', 'colorTest')
@@ -86,9 +87,10 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     colorLow = np.array([lowHue, lowSat, lowVal])
     colorHigh = np.array([highHue, highSat, highVal])
     mask = cv2.inRange(frameHSV, colorLow, colorHigh)
+
     # Show the first mask
-    resized_mask = cv2.resize(frame, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
-    cv2.imshow('plain', resized_mask)
+    resized_mask = cv2.resize(mask, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
+    cv2.imshow('mask-plain', resized_mask)
 
     im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -112,8 +114,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
             trayectory = ball.add_position((int(cx), int(cy)))
 
-    for x in range(number_of_sections - 1):
-        cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)
+    # for x in range(number_of_sections - 1):
+    #     cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)
 
     if trayectory:
         cv2.line(frame, trayectory[0], trayectory[1], (0, 0, 255), 2)
