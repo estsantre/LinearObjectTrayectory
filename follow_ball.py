@@ -33,9 +33,6 @@ vidCapture = cv2.VideoCapture(0)
 FRAME_WIDTH = vidCapture.get(3)
 FRAME_HEIGHT = vidCapture.get(4)
 
-vidCapture.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
-vidCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
-
 # Secciones
 
 number_of_sections = 32

@@ -41,12 +41,9 @@ time.sleep(1)
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 
-rawCapture.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
-rawCapture.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
-
 # Sections
 
-number_of_sections = 32
+number_of_sections = 6
 sections = []
 
 distance_between_lines = FRAME_HEIGHT / number_of_sections
