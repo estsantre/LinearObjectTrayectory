@@ -88,7 +88,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     mask = cv2.inRange(frameHSV, colorLow, colorHigh)
     # Show the first mask
     resized_mask = cv2.resize(frame, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
-    # cv2.imshow('plain', resized_mask)
+    cv2.imshow('plain', resized_mask)
 
     im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -120,7 +120,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     # Show final output image
     resized_frame = cv2.resize(frame, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
-    # cv2.imshow('colorTest', resized_frame)
+    cv2.imshow('colorTest', resized_frame)
 
     rawCapture.truncate(0)
 
