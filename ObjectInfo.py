@@ -18,8 +18,6 @@ class ObjectInfo:
 
         else:
             self.difference_between_positions(position)
-
-        print("Section --> ", self.section)
         return self.destination
 
     def difference_between_positions(self, position):

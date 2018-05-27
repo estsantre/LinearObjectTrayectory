@@ -28,7 +28,7 @@ cv2.createTrackbar('highSat', 'colorTest', icol[4], 255, nothing)
 cv2.createTrackbar('highVal', 'colorTest', icol[5], 255, nothing)
 
 # # Area Value
-cv2.createTrackbar('MaxArea', 'colorTest', icol[6], 31000, nothing)
+cv2.createTrackbar('MinArea', 'colorTest', icol[6], 31000, nothing)
 
 # Initialize camera
 
@@ -40,6 +40,9 @@ time.sleep(1)
 
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
+
+RESIZED_WIDTH = int(FRAME_WIDTH/2)
+RESIZED_HEIGHT = int(FRAME_HEIGHT/2)
 
 # Sections
 
@@ -61,7 +64,7 @@ trayectory = None
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 
-
+    e1 = cv2.getTickCount()
 
     # Get HSV values from the GUI sliders.
     lowHue = cv2.getTrackbarPos('lowHue', 'colorTest')
@@ -70,7 +73,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     highHue = cv2.getTrackbarPos('highHue', 'colorTest')
     highSat = cv2.getTrackbarPos('highSat', 'colorTest')
     highVal = cv2.getTrackbarPos('highVal', 'colorTest')
-    max_area = cv2.getTrackbarPos('MaxArea', 'colorTest')
+    min_area = cv2.getTrackbarPos('MinArea', 'colorTest')
 
 
     # Get webcam frame
@@ -84,7 +87,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     colorHigh = np.array([highHue, highSat, highVal])
     mask = cv2.inRange(frameHSV, colorLow, colorHigh)
     # Show the first mask
-    cv2.imshow('mask-plain', mask)
+    resized_mask = cv2.resize(frame, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
+    cv2.imshow('plain', resized_mask)
 
     im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -96,7 +100,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
         area = cv2.contourArea(biggest_contour)
 
-        if area > max_area:
+        if area > min_area:
             x, y, w, h = cv2.boundingRect(biggest_contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
@@ -108,8 +112,6 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
             trayectory = ball.add_position((int(cx), int(cy)))
 
-            print(trayectory[0], trayectory[1])
-
     for x in range(number_of_sections - 1):
         cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)
 
@@ -117,13 +119,18 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
         cv2.line(frame, trayectory[0], trayectory[1], (0, 0, 255), 2)
 
     # Show final output image
-    cv2.imshow('colorTest', frame)
+    resized_frame = cv2.resize(frame, (RESIZED_WIDTH, RESIZED_HEIGHT), interpolation=cv2.INTER_AREA)
+    cv2.imshow('colorTest', resized_frame)
 
     rawCapture.truncate(0)
 
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
+
+    e2 = cv2.getTickCount()
+    time = (e2 - e1) / cv2.getTickFrequency()
+    print(time)
 
 cv2.destroyAllWindows()
 print("Finalizó completamente")
