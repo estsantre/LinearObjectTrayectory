@@ -119,9 +119,12 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     # Show final output image
     cv2.imshow('colorTest', frame)
 
+    rawCapture.truncate(0)
+
     k = cv2.waitKey(5) & 0xFF
     if k == 27:
         break
 
 cv2.destroyAllWindows()
-vidCapture.release()
+print("Finalizó completamente")
+
