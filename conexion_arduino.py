@@ -3,12 +3,12 @@ import serial
 active = True
 
 try:
-    serial_out = serial.Serial("ArduinoUno", 9600)
+    serial_out = serial.Serial("/dev/ArduinoUno", 9600)
     print("Se conectó a ArduinoUno")
 except:
     try:
         serial_out = serial.Serial("/dev/ttyACM0", 9600)
-        print("Se conectó a /dev/ttyACM1")
+        print("Se conectó a /dev/ttyACM0")
     except:
         active = False
         print("No se conectó al Arduino")
