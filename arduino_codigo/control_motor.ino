@@ -1,3 +1,10 @@
+#include <Stepper.h>
+
+const int numberOfSteps = 100;
+const int motor_speed = 60;
+
+// initialize the stepper library on pins 8 through 11:
+Stepper myStepper(numberOfSteps, 8, 9, 10, 11);
 
 String inString = "";    // string to hold input
 int value = 0;
@@ -7,6 +14,7 @@ void setup()
 {
   Serial.begin(9600);
   pinMode(LED, OUTPUT);
+  myStepper.setSpeed(motor_speed);
 }
 
 void loop() {
@@ -22,6 +30,8 @@ void loop() {
       value = inString.toInt();
       Serial.println(value);
 
+      // CAMBIAR ESTE CICLO POR LA LOGICA DEL MOTOR
+      // myStepper.step(numberOfSteps);
       for (int i = 0; i<value; i++)
       {
         digitalWrite(LED, HIGH);
