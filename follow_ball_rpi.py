@@ -7,11 +7,23 @@ from ObjectInfo import ObjectInfo
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
+import conexion_arduino
 
 
 def nothing(*arg):
     print("Nothing!!!")
     pass
+
+
+def get_percentage(value):
+
+    result = int(value * 100 / FRAME_WIDTH)
+    if result > 100:
+        return 100
+    elif result < 0:
+        return 0
+    else:
+        return result
 
 
 icol = (0, 0, 0, 255, 255, 255, 31000)
@@ -113,6 +125,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
 
             trayectory = ball.add_position((int(cx), int(cy)))
+
+            conexion_arduino.send_serial(get_percentage(trayectory[1][0]))
 
     # for x in range(number_of_sections - 1):
     #     cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)

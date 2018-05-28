@@ -1,6 +1,6 @@
 import serial
 
-activo = True
+active = True
 
 try:
     serial_out = serial.Serial("/dev/ttyACM0", 9600)
@@ -10,18 +10,19 @@ except:
         serial_out = serial.Serial("/dev/ttyACM1", 9600)
         print("Se conectó a /dev/ttyACM1")
     except:
-        activo = False
+        active = False
         print("No se conectó al Arduino")
 
-def enviardato(dato):
 
-    if activo:
-        # dato = dato.encode('UTF-8')  # Se convierte a bits
-        serial_out.write(dato)
+#Función para enviar datos
+def send_serial(data):
 
+    if active:
+        data = "{0}\n".format(data)
+        serial_out.write(bytes(data, encoding='utf-8'))
 
-def cerrar_conexion():
+def close_connection():
 
-    if activo:
-        serial_out.write(b'5')
+    if active:
+        send_serial("50")
         serial_out.close()

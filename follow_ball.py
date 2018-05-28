@@ -4,6 +4,7 @@ from __future__ import division
 import cv2
 import numpy as np
 from ObjectInfo import ObjectInfo
+import conexion_arduino
 
 
 def nothing(*arg):
@@ -11,7 +12,18 @@ def nothing(*arg):
     pass
 
 
-icol = (0, 0, 0, 255, 255, 255, 31000)
+def get_percentage(value):
+
+    result = int(value * 100 / FRAME_WIDTH)
+    if result > 100:
+        return 100
+    elif result < 0:
+        return 0
+    else:
+        return result
+
+
+icol = (93, 76, 47, 139, 198, 133, 31000)
 
 cv2.namedWindow('colorTest')
 
@@ -102,6 +114,9 @@ while True:
             cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
 
             trayectory = ball.add_position((int(cx), int(cy)))
+
+            conexion_arduino.send_serial(get_percentage(trayectory[1][0]))
+
 
     for x in range(number_of_sections - 1):
         cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)
