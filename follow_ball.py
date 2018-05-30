@@ -8,7 +8,6 @@ import conexion_arduino
 
 
 def nothing(*arg):
-    print("Nothing!!!")
     pass
 
 
@@ -23,7 +22,7 @@ def get_percentage(value):
         return result
 
 
-icol = (93, 76, 47, 139, 198, 133, 31000)
+icol = (0, 0, 0, 255, 255, 255, 31000, 0)
 
 cv2.namedWindow('colorTest')
 
@@ -39,6 +38,8 @@ cv2.createTrackbar('highVal', 'colorTest', icol[5], 255, nothing)
 # # Area Value
 cv2.createTrackbar('MinArea', 'colorTest', icol[6], 31000, nothing)
 
+cv2.createTrackbar('OnOff', 'colorTest', icol[7], 1, nothing)
+
 # Initialize camera
 vidCapture = cv2.VideoCapture(0)
 
@@ -50,7 +51,7 @@ RESIZED_HEIGHT = int(FRAME_HEIGHT/1)
 
 # Secciones
 
-number_of_sections = 32
+number_of_sections = 8
 sections = []
 
 distance_between_lines = FRAME_HEIGHT / number_of_sections
@@ -78,7 +79,7 @@ while True:
     highSat = cv2.getTrackbarPos('highSat', 'colorTest')
     highVal = cv2.getTrackbarPos('highVal', 'colorTest')
     min_area = cv2.getTrackbarPos('MinArea', 'colorTest')
-
+    on_off = cv2.getTrackbarPos('OnOff', 'colorTest')
 
     # Get webcam frame
     _, frame = vidCapture.read()
@@ -113,9 +114,12 @@ while True:
             x, y, w, h = cv2.boundingRect(biggest_contour)
             cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
 
-            trayectory = ball.add_position((int(cx), int(cy)))
+            new_trayectory = ball.add_position((int(cx), int(cy)))
 
-            conexion_arduino.send_serial(get_percentage(trayectory[1][0]))
+            if new_trayectory != trayectory and on_off == 1:
+                conexion_arduino.send_serial(get_percentage(new_trayectory[1][0]))
+                trayectory = new_trayectory
+                print(get_percentage(new_trayectory[1][0]))
 
 
     for x in range(number_of_sections - 1):
@@ -134,7 +138,7 @@ while True:
 
     e2 = cv2.getTickCount()
     time = (e2 - e1) / cv2.getTickFrequency()
-    print(time)
+    # print(time)
 
 cv2.destroyAllWindows()
 vidCapture.release()

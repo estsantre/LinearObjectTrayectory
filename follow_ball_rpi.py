@@ -11,7 +11,6 @@ import conexion_arduino
 
 
 def nothing(*arg):
-    print("Nothing!!!")
     pass
 
 
@@ -26,7 +25,7 @@ def get_percentage(value):
         return result
 
 
-icol = (0, 0, 0, 255, 255, 255, 31000)
+icol = (0, 0, 0, 255, 255, 255, 31000, 0)
 
 cv2.namedWindow('colorTest')
 cv2.namedWindow('mask-plain')
@@ -42,6 +41,8 @@ cv2.createTrackbar('highVal', 'colorTest', icol[5], 255, nothing)
 
 # # Area Value
 cv2.createTrackbar('MinArea', 'colorTest', icol[6], 31000, nothing)
+
+cv2.createTrackbar('OnOff', 'mask-plain', icol[7], 1, nothing)
 
 # Initialize camera
 
@@ -59,7 +60,7 @@ RESIZED_HEIGHT = int(FRAME_HEIGHT/2)
 
 # Sections
 
-number_of_sections = 6
+number_of_sections = 8
 sections = []
 
 distance_between_lines = FRAME_HEIGHT / number_of_sections
@@ -87,6 +88,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
     highSat = cv2.getTrackbarPos('highSat', 'colorTest')
     highVal = cv2.getTrackbarPos('highVal', 'colorTest')
     min_area = cv2.getTrackbarPos('MinArea', 'colorTest')
+    on_off = cv2.getTrackbarPos('OnOff', 'mask-plain')
 
 
     # Get webcam frame
@@ -124,9 +126,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
             x, y, w, h = cv2.boundingRect(biggest_contour)
             cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
 
-            trayectory = ball.add_position((int(cx), int(cy)))
+            new_trayectory = ball.add_position((int(cx), int(cy)))
 
-            conexion_arduino.send_serial(get_percentage(trayectory[1][0]))
+            if new_trayectory != trayectory and on_off == 1:
+                conexion_arduino.send_serial(get_percentage(new_trayectory[1][0]))
+                trayectory = new_trayectory
 
     # for x in range(number_of_sections - 1):
     #     cv2.line(frame, sections[x][0], sections[x][1], (0, 0, 255), 1)
@@ -146,7 +150,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
     e2 = cv2.getTickCount()
     time = (e2 - e1) / cv2.getTickFrequency()
-    print(time)
+    # print(time)
 
 cv2.destroyAllWindows()
 print("Finalizó completamente")
